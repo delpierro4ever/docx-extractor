@@ -8,13 +8,22 @@ const upload = multer({ dest: 'uploads/' });
 
 app.post('/extract', upload.single('data'), async (req, res) => {
   try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded. Make sure the field name is "data".' });
+    }
+
     const buffer = await fs.readFile(req.file.path);
     const result = await mammoth.extractRawText({ buffer });
     await fs.unlink(req.file.path); // cleanup
+
     res.json({ text: result.value });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Extraction failed.' });
+    console.error('[ERROR extracting DOCX]:', err);
+    res.status(500).json({
+      error: 'Extraction failed.',
+      message: err.message,
+      stack: err.stack
+    });
   }
 });
 
