@@ -6,7 +6,7 @@ import fs from 'fs/promises';
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
-app.post('/extract', upload.single('data'), async (req, res) => {
+app.post('/extract', upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded. Make sure the field name is "data".' });
